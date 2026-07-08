@@ -1,11 +1,7 @@
+import AppRouter from "./routes/AppRouter";
+
 function App() {
-  const developer = "Thiago Masson";
-  return (
-    <>
-      <h1> Bienvenido a Top Shape</h1 >
-      <p>Desarrollado por {developer}</p>
-    </>
-  );
+  return <AppRouter />;
 }
 
 export default App;
