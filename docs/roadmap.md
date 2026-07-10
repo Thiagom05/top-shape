@@ -1,47 +1,61 @@
 # Roadmap del Proyecto - Top Shape
 
-Este documento describe el estado actual de la implementación del proyecto y los próximos hitos a desarrollar. El progreso está dividido en tres áreas clave: **Backend**, **Frontend** y **Deployment**.
+Este documento describe el estado de implementación del proyecto y los próximos hitos a desarrollar en base a la finalización del **Módulo 1 (Base de Datos)**.
 
 ---
 
-## Estado General del Proyecto
+## Estado de Avance del Proyecto
 
-* **Fase Actual**: Fase 1 - Cimentación del Modelo de Datos (Completada).
-* **Próxima Fase**: Fase 2 - Autenticación, Almacenamiento y Seguridad de Datos (Planificada).
-
----
-
-## 1. Backend & Base de Datos
-Implementación de la infraestructura del servidor de base de datos, persistencia, esquemas y lógica de almacenamiento seguro.
-
-* [x] **Diseño de Base de Datos**: Planificación física y lógica del diagrama de entidad-relación (ERD).
-* [x] **Tabla: Profiles**: Configuración de la entidad que extiende de Supabase Auth para datos de usuarios.
-* [x] **Tabla: Progress Photos**: Esquema de fotos de evolución física con validaciones de unicidad.
-* [x] **Tabla: Resources**: Estructura de recursos educativos para albergar videos y PDFs.
-* [ ] **Supabase Storage**: Creación de buckets (`progress-photos`, `documents`, `videos`) y estructuración de carpetas.
-* [ ] **Supabase Authentication**: Integración y configuración del flujo de inicio de sesión y registro de usuarios.
-* [ ] **Políticas RLS (Row Level Security)**: Definición de reglas estrictas para aislar los datos privados de cada usuario e impedir accesos no autorizados.
+* **Módulo Completado**: 🟩 Módulo 1 - Base de Datos
+* **Módulo en Progreso**: 🟨 Módulo 2 - Storage (Almacenamiento)
+* **Próximos Módulos**: ⬜ Auth, Dashboard, Panel de Administración y Despliegue
 
 ---
 
-## 2. Frontend & Aplicación Cliente
-Desarrollo de la interfaz de usuario con React, lógica de enrutamiento y consumo de servicios de Supabase.
+## Listado de Hitos y Tareas
 
-* [x] **Configuración Inicial del Cliente**: Setup básico de React + Vite y conexión con la API de Supabase en `src/lib/supabase.js`.
-* [ ] **Integración de Autenticación**: Formularios de Login, Registro y recuperación de contraseña con sesión persistente.
+### 🌐 Arquitectura y Herramientas Iniciales
+* [x] **Arquitectura Inicial**: Planificación conceptual de la SPA y del backend serverless.
+* [x] **Supabase CLI**: Configuración del entorno de desarrollo local con Docker Desktop y vinculación mediante `supabase link`.
+* [x] **Versionado por Migraciones**: Establecimiento del flujo de control de versiones de base de datos como código.
+
+### 🗄️ Módulo 1: Base de Datos & Modelado
+* [x] **Estructura de Base de Datos**: Creación e implementación de tablas en PostgreSQL.
+  * [x] **Tabla Profiles**: Datos adicionales del participante enlazados 1:1.
+  * [x] **Tabla Progress Photos**: Registro de fotos de progreso físico.
+  * [x] **Tabla Resources**: Catálogo de videos y guías escritas.
+* [x] **Tipos ENUM**: Implementación de validaciones a nivel de motor (`user_role`, `photo_phase`, `photo_view`, `resource_type`, `resource_category`).
+* [x] **Seguridad RLS (Row Level Security)**: Aislamiento por usuario de todas las tablas en base a `auth.uid()`.
+* [x] **Políticas de Acceso (Policies)**: Reglas granulares de lectura y escritura para perfiles, fotos y recursos.
+* [x] **Función Auxiliar**: Creación de `public.is_admin()` para centralizar permisos de administración.
+* [x] **Automatización por Trigger**: Implementación de `handle_new_user()` para crear perfiles automáticos.
+
+### 📦 Módulo 2: Storage (Almacenamiento)
+* [/] **Configuración de Buckets**: Creación de los repositorios de almacenamiento (`progress-photos`, `documents`, `videos`) en Supabase Storage (en progreso).
+* [ ] **Políticas RLS en Storage**: Protección a nivel de directorio para aislar las fotos privadas de cada usuario según su UUID.
+* [ ] **Subida e Integración**: Desarrollo en frontend del cargador de imágenes y visualizador de recursos.
+
+### 🔐 Módulo 3: Autenticación & Flujo de Usuarios
+* [ ] **Autenticación en Frontend**: Formularios de login y registro.
+* [ ] **Registro Simplificado**: Creación de cuentas solicitando inicialmente solo correo y contraseña.
+* [ ] **Completado de Perfil**: Interfaz obligatoria para ingresar datos de perfil (nombre, apellido, teléfono) en el primer inicio de sesión del usuario.
+
+### 💻 Módulo 4: Interfaces (Dashboards)
 * [ ] **Dashboard del Participante**:
-  * [ ] Panel de visualización de rutinas y planes de alimentación por categorías.
-  * [ ] Interfaz de carga y visualización de las 6 fotografías de progreso (antes/después, frente/perfil/espalda).
+  * [ ] Panel de visualización de rutinas y planes de nutrición.
+  * [ ] Cargador y comparador de las 6 fotografías de progreso.
 * [ ] **Panel de Administración (Admin Dashboard)**:
-  * [ ] Gestión de usuarios registrados y control de perfiles.
-  * [ ] Módulo para subir nuevos PDFs y enlaces de video directamente al storage de recursos.
-  * [ ] Visor del historial y comparación de evolución de fotos de los participantes.
+  * [ ] Visualización de participantes y comparación interactiva de fotos antes/después.
+  * [ ] Carga y publicación de nuevos PDFs y videos de entrenamiento.
+
+### 🚀 Módulo 5: Despliegue e Infraestructura
+* [ ] **Configuración de Entornos**: Integración de variables secretas en producción.
+* [ ] **Deploy de la Base de Datos**: Despliegue automático de migraciones a producción.
+* [ ] **Deploy del Frontend**: Alojamiento público de la SPA.
 
 ---
 
-## 3. Deployment & Infraestructura
-Configuración de entornos, CI/CD y publicación del software a producción.
-
-* [ ] **Entornos de Desarrollo e Integración**: Configuración de variables de entorno seguras (`.env`) en producción y local.
-* [ ] **Deploy del Frontend**: Publicación de la SPA (por ejemplo, en Vercel, Netlify o Supabase Hosting).
-* [ ] **Deploy de la Base de Datos**: Migraciones de base de datos automatizadas y puesta a punto de Supabase en producción.
+## Leyenda de Estados
+* ✅ **Completado**: El requerimiento está programado, probado y versionado.
+* 🟡 **En Progreso**: Actualmente bajo diseño o codificación.
+* ⬜ **Pendiente**: Planificado para futuros ciclos de desarrollo.

@@ -1,84 +1,72 @@
 # Estructura de Almacenamiento - Supabase Storage
 
-Este documento describe la arquitectura del sistema de almacenamiento de archivos de **Top Shape**, gestionado a través de **Supabase Storage**. Se definen los buckets de almacenamiento, el tipo de archivos que albergan, las políticas de acceso y la estructura lógica de los directorios.
+Este documento describe la arquitectura del sistema de almacenamiento de archivos de **Top Shape**, gestionado a través de **Supabase Storage**. 
+
+> [!IMPORTANT]
+> **Estado del Módulo**: 
+> La infraestructura de almacenamiento descrita a continuación **no está implementada** en el entorno de desarrollo actual. Este documento representa el diseño técnico formal y planificado para el Módulo 2 del proyecto.
 
 ---
 
-## 1. Catálogo de Buckets
+## 1. Buckets Planificados
 
-El almacenamiento en la nube se organiza en tres buckets independientes con propósitos y configuraciones de seguridad específicas:
+El almacenamiento en la nube se organizará en tres buckets independientes con propósitos y configuraciones de seguridad específicas:
 
 | Bucket | Tipo de Acceso | Formatos Permitidos | Propósito |
 |---|---|---|---|
-| **`progress-photos`** | Privado (Protegido por RLS) | `jpeg`, `jpg`, `png` | Fotos de progreso físico de los participantes (antes/después, frontal/perfil/espalda). |
-| **`documents`** | Público / Lectura Autenticados | `pdf` | Planes de alimentación, guías escritas y rutinas en PDF de los entrenadores. |
-| **`videos`** | Público / Lectura Autenticados | `mp4`, `webm` | Tutoriales de técnicas de ejercicios y videos de bienvenida. |
+| **`progress-photos`** | Privado (Protegido por RLS) | `jpeg`, `jpg`, `png` | Fotos de progreso físico del participante agrupadas por fase. |
+| **`documents`** | Lectura Autenticados | `pdf` | Planes de alimentación y rutinas en PDF cargados por los administradores. |
+| **`videos`** | Lectura Autenticados | `mp4` | Videos explicativos y de bienvenida cargados por administradores. |
 
 ---
 
-## 2. Descripción de Buckets y Estructura de Archivos
+## 2. Estructura de Directorios Diseñada
 
 ### 2.1. Bucket: `progress-photos`
-Este bucket contiene las imágenes de control físico que suben los participantes. Dado que son datos personales sensibles, requiere restricciones de seguridad estrictas.
+Este bucket contendrá las imágenes de control físico que suben los participantes. Para facilitar el orden y asegurar el correcto funcionamiento de las políticas de seguridad por RLS, se adopta la siguiente estructura jerárquica basada en directorios:
 
-* **Estructura lógica de directorios**:
-  Los archivos se organizan por carpetas utilizando el identificador único del usuario (`UUID`), lo que simplifica la segmentación y las reglas de seguridad.
-  ```text
-  progress-photos/
-  └── {user_id}/
-      ├── before_front.jpg
-      ├── before_side.jpg
-      ├── before_back.jpg
-      ├── after_front.jpg
-      ├── after_side.jpg
-      └── after_back.jpg
-  ```
-* **Acceso y Seguridad**:
-  * **Acceso Privado**: El bucket no tiene URL de acceso público.
-  * **Políticas RLS**:
-    * **Lectura**: Un usuario autenticado solo puede leer y descargar sus propias fotos. Los administradores pueden leer las fotos de todos los participantes.
-    * **Escritura (Inserción/Actualización)**: Un usuario autenticado solo puede subir archivos dentro de su directorio `{user_id}/`.
-    * **Eliminación**: Deshabilitada para usuarios regulares para preservar el historial de progreso. Solo administradores pueden realizar limpiezas.
+```text
+progress-photos/
+└── {user_id}/             <-- UUID del participante (profiles.id)
+    ├── before/            <-- Carpeta para la fase inicial del proceso
+    │   ├── front.jpg      <-- Vista de frente inicial
+    │   ├── side.jpg       <-- Vista lateral inicial
+    │   └── back.jpg       <-- Vista de espalda inicial
+    └── after/             <-- Carpeta para la fase final de resultados
+        ├── front.jpg      <-- Vista de frente final
+        ├── side.jpg       <-- Vista lateral final
+        └── back.jpg       <-- Vista de espalda final
+```
+
+#### Reglas de Acceso y Control
+* **Seguridad basada en UID**: Las políticas RLS del storage asegurarán que un usuario únicamente pueda leer y escribir objetos dentro del directorio que coincida con su UUID (`{user_id}`).
+* **Nomenclatura Fija**: El frontend mapeará las cargas de imágenes utilizando nombres fijos de archivo (`front.jpg`, `side.jpg`, `back.jpg`) dentro del subdirectorio de fase correspondiente (`before/` o `after/`). Las rutas relativas de almacenamiento guardadas en la tabla `progress_photos` seguirán este formato exacto: `{user_id}/before/front.jpg`.
 
 ---
 
 ### 2.2. Bucket: `documents`
-Almacena archivos PDF de soporte para los participantes. Estos documentos son cargados exclusivamente por el equipo de administración de Top Shape.
+Almacena los documentos de soporte del programa cargados exclusivamente por el equipo administrador de Top Shape.
 
-* **Estructura lógica de directorios**:
-  Se estructuran por categorías que coinciden con las categorías temáticas de los recursos:
+* **Estructura Esperada**:
   ```text
   documents/
-  ├── welcome/
-  │   └── guia_de_bienvenida.pdf
-  ├── training/
-  │   ├── rutina_hipertrofia_principiantes.pdf
-  │   └── guia_tecnica_estiramiento.pdf
-  └── nutrition/
-      ├── plan_alimentario_base.pdf
-      └── lista_de_compras_saludables.pdf
+  ├── training.pdf           <-- Guía de rutinas y ejercicios
+  └── nutrition.pdf          <-- Plan alimenticio base
   ```
-* **Acceso y Seguridad**:
-  * **Acceso de Lectura**: Público para todos los usuarios de la plataforma que estén autenticados, lo que permite visualizar los archivos mediante enlaces firmados o URLs públicas controladas.
-  * **Acceso de Escritura**: Restringido exclusivamente al rol `admin`. Los usuarios regulares no tienen permisos para subir ni modificar estos archivos.
+* **Políticas de Acceso**:
+  * **Lectura**: Permitida para cualquier usuario autenticado de la plataforma.
+  * **Escritura**: Restringida únicamente al rol `'admin'` a través de la validación RLS correspondiente.
 
 ---
 
 ### 2.3. Bucket: `videos`
-Almacena los contenidos multimedia para el aprendizaje dinámico y guía de ejercicios.
+Almacena los archivos multimedia interactivos del programa.
 
-* **Estructura lógica de directorios**:
-  Al igual que los documentos, se agrupan temáticamente para mantener una fácil administración y mantenimiento:
+* **Estructura Esperada**:
   ```text
   videos/
-  ├── welcome/
-  │   └── video_bienvenida_coach.mp4
-  ├── training/
-  │   ├── ejecucion_sentadilla_perfecta.mp4
-  │   └── tecnica_peso_muerto.mp4
-  └── nutrition/
-      └── preparacion_viandas_semanales.mp4
+  └── welcome.mp4            <-- Video de bienvenida del coach
   ```
-* **Acceso y Seguridad**:
-  * **Acceso de Lectura**: Permitido para usuarios autenticados. Se recomienda el uso de reproductores de video HTML5 en el frontend que apunten a los recursos cargados.
-  * **Acceso de Escritura**: Exclusivo para administradores (`admin`). Se aconseja limitar el tamaño máximo de subida para prevenir el agotamiento de recursos del plan de Supabase.
+* **Políticas de Acceso**:
+  * **Lectura**: Permitida para usuarios autenticados. El reproductor del frontend apuntará directamente al path del bucket.
+  * **Escritura**: Permitida exclusivamente para usuarios con rol `'admin'`.
