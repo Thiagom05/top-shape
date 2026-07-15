@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { register } from "../services/authService";
+import { useAlert } from "../../../context/AlertContext";
 
 export default function RegisterForm({ onToggle }) {
     const [name, setName] = useState("");
@@ -10,28 +11,45 @@ export default function RegisterForm({ onToggle }) {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const { showAlert } = useAlert();
     const navigate = useNavigate();
 
     async function handleSubmit(e) {
         e.preventDefault();
 
         if (!name.trim() || !lastName.trim() || !email.trim() || !password || !confirmPassword) {
-            alert("Por favor, completa todos los campos.");
+            showAlert({
+                title: "Campos incompletos",
+                message: "Por favor, completa todos los campos.",
+                type: "warning"
+            });
             return;
         }
 
         if (password !== confirmPassword) {
-            alert("Las contraseñas no coinciden.");
+            showAlert({
+                title: "Contraseñas no coinciden",
+                message: "Las contraseñas ingresadas no coinciden.",
+                type: "warning"
+            });
             return;
         }
 
         try {
             setLoading(true);
             await register(email.trim(), password, name.trim(), lastName.trim());
-            alert("Usuario registrado correctamente");
+            showAlert({
+                title: "¡Registro exitoso!",
+                message: "Tu cuenta ha sido creada correctamente.",
+                type: "success"
+            });
             navigate("/home");
         } catch (error) {
-            alert("Error al registrarse: " + error.message);
+            showAlert({
+                title: "Error al registrarse",
+                message: error.message,
+                type: "error"
+            });
         } finally {
             setLoading(false);
         }

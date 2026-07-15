@@ -41,6 +41,11 @@ export default function HomePage() {
                         />
                     ) : (
                         <div className="video-thumbnail-container" onClick={() => setIsPlaying(true)}>
+                            <img 
+                                src="/assets/DSC02018.webp" 
+                                className="video-thumbnail-img" 
+                                alt="Portada Video de Bienvenida" 
+                            />
                             <div className="play-button-overlay" style={{ zIndex: 2 }}>
                                 <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
                                     <polygon points="5 3 19 12 5 21 5 3" />

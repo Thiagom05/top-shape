@@ -1,19 +1,25 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../services/authService";
+import { useAlert } from "../../../context/AlertContext";
 
 export default function LoginForm({ onToggle }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const { showAlert } = useAlert();
     const navigate = useNavigate();
 
     async function handleSubmit(e) {
         e.preventDefault();
 
         if (!email.trim() || !password) {
-            alert("Por favor, completa todos los campos.");
+            showAlert({
+                title: "Campos incompletos",
+                message: "Por favor, completa todos los campos.",
+                type: "warning"
+            });
             return;
         }
 
@@ -22,7 +28,11 @@ export default function LoginForm({ onToggle }) {
             await login(email.trim(), password);
             navigate("/home");
         } catch (error) {
-            alert("Error al iniciar sesión: " + error.message);
+            showAlert({
+                title: "Error al iniciar sesión",
+                message: error.message,
+                type: "error"
+            });
         } finally {
             setLoading(false);
         }
