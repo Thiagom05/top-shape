@@ -1,0 +1,19 @@
+# Dependencias y Builds
+node_modules/
+dist/
+dist-ssr/
+.env
+.env.local
+.env.*.local
+
+# Temporales de editores e IDEs
+.vscode/
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+Thumbs.db
+
+# Temporales de Supabase CLI local
+top-shape/supabase/.temp/
+top-shape/supabase/.branches/
