@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useAlert } from "../context/AlertContext";
+import { compressImage } from "../utils/imageOptimizer";
 import { 
     uploadProgressPhoto, 
     getProgressPhotoUrl, 
@@ -10,6 +12,7 @@ import {
 
 export default function ProgressPage() {
     const { user } = useAuth();
+    const { showAlert } = useAlert();
     
     // Estados para los ángulos seleccionados en cada fase
     const [beforeAngle, setBeforeAngle] = useState("front");
@@ -64,7 +67,11 @@ export default function ProgressPage() {
 
         // Validar formato (solo imágenes)
         if (!file.type.startsWith("image/")) {
-            alert("Por favor, selecciona un archivo de imagen válido (JPEG, JPG o PNG).");
+            await showAlert({
+                title: "Formato de imagen inválido",
+                message: "Por favor, selecciona un archivo de imagen válido (JPEG, JPG o PNG).",
+                type: "error"
+            });
             return;
         }
 
@@ -72,8 +79,11 @@ export default function ProgressPage() {
         try {
             setUploading(photoId);
 
+            // Comprimir la imagen en el cliente de manera asíncrona
+            const optimizedFile = await compressImage(file);
+
             // 1. Subir la imagen al storage de Supabase
-            const storagePath = await uploadProgressPhoto(user.id, file, phase, view);
+            const storagePath = await uploadProgressPhoto(user.id, optimizedFile, phase, view);
 
             // 2. Guardar el registro en la tabla de la base de datos progress_photos
             await saveProgressPhotoRecord(user.id, phase, view, storagePath);
@@ -87,9 +97,17 @@ export default function ProgressPage() {
                 [photoId]: signedUrl
             }));
 
-            alert("Foto subida correctamente.");
+            await showAlert({
+                title: "Éxito",
+                message: "Foto subida correctamente.",
+                type: "success"
+            });
         } catch (error) {
-            alert("Error al subir la foto: " + error.message);
+            await showAlert({
+                title: "Error al subir",
+                message: "Error al subir la foto: " + error.message,
+                type: "error"
+            });
         } finally {
             setUploading(null);
         }
@@ -217,12 +235,6 @@ export default function ProgressPage() {
 
             {/* Banner Motivacional */}
             <div className="progress-alert-banner">
-                <div className="progress-alert-icon">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
-                        <path d="M12 16v-4M12 8h.01" />
-                    </svg>
-                </div>
                 <div>
                     <strong style={{ display: "block", marginBottom: "2px" }}>¡Tu progreso inspira!</strong>
                     No te olvides de tomarte la foto con buena luz natural, en la misma posición y vistiendo la misma ropa para ver la transformación de forma clara.

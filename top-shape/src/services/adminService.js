@@ -70,3 +70,90 @@ export async function uploadResourceFile(file, fileName, type) {
 
     return data.path;
 }
+
+/**
+ * Obtiene la lista de todos los recursos que son videos (para recursos adicionales).
+ */
+export async function fetchAdminResourceVideos() {
+    const { data, error } = await supabase
+        .from("resources")
+        .select("*")
+        .eq("type", "video")
+        .eq("category", "training")
+        .order("created_at", { ascending: true });
+
+    if (error) {
+        throw error;
+    }
+
+    return data;
+}
+
+/**
+ * Agrega un nuevo video de recurso: sube el archivo al storage y crea el registro en la base de datos.
+ */
+export async function addResourceVideo(title, subtitle, file) {
+    // Generar un nombre único basado en timestamp para evitar sobreescribir otros
+    const fileExt = file.name.split('.').pop() || 'mp4';
+    const uniqueFileName = `resource_video_${Date.now()}.${fileExt}`;
+
+    // 1. Subir el archivo al Storage
+    const { error: storageError } = await supabase.storage
+        .from("videos")
+        .upload(uniqueFileName, file, {
+            contentType: file.type
+        });
+
+    if (storageError) {
+        throw storageError;
+    }
+
+    const formattedTitle = `${title} | ${subtitle}`;
+
+    // 2. Insertar el registro en la tabla resources
+    const { data: dbData, error: dbError } = await supabase
+        .from("resources")
+        .insert([
+            {
+                title: formattedTitle,
+                type: "video",
+                category: "training",
+                storage_path: uniqueFileName
+            }
+        ])
+        .select();
+
+    if (dbError) {
+        // Si falla la BD, intentamos limpiar el archivo subido
+        await supabase.storage.from("videos").remove([uniqueFileName]);
+        throw dbError;
+    }
+
+    return dbData[0];
+}
+
+/**
+ * Elimina un video de recurso: borra el registro de la base de datos y el archivo del storage.
+ */
+export async function deleteResourceVideo(id, storagePath) {
+    // 1. Eliminar el registro en la base de datos
+    const { error: dbError } = await supabase
+        .from("resources")
+        .delete()
+        .eq("id", id);
+
+    if (dbError) {
+        throw dbError;
+    }
+
+    // 2. Eliminar el archivo del Storage
+    if (storagePath) {
+        const { error: storageError } = await supabase.storage
+            .from("videos")
+            .remove([storagePath]);
+        
+        if (storageError) {
+            console.warn("No se pudo eliminar el archivo del Storage:", storageError.message);
+        }
+    }
+}

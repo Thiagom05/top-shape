@@ -26,7 +26,7 @@ export default function HomePage() {
             {/* Columna Izquierda: Bienvenida y Video */}
             <div>
                 <div className="welcome-header">
-                    <h2>¡Hola, {profile?.name || "Participante"}! 👋</h2>
+                    <h2>¡Hola, {profile?.name || "Participante"}!</h2>
                     <p>Bienvenido/a al reto Top Shape</p>
                 </div>
 
@@ -37,12 +37,11 @@ export default function HomePage() {
                             controls
                             autoPlay
                             className="video-player"
-                            style={{ width: "100%", aspectRatio: "16/9", backgroundColor: "#000", display: "block" }}
+                            style={{ width: "100%", aspectRatio: "9/16", backgroundColor: "#000", display: "block" }}
                         />
                     ) : (
                         <div className="video-thumbnail-container" onClick={() => setIsPlaying(true)}>
-                            {/* Imagen de fondo representativa o fallback degradado */}
-                            <div className="play-button-overlay">
+                            <div className="play-button-overlay" style={{ zIndex: 2 }}>
                                 <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
                                     <polygon points="5 3 19 12 5 21 5 3" />
                                 </svg>
