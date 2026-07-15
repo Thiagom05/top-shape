@@ -5,6 +5,7 @@ export async function register(email, password, name, lastName) {
         email,
         password,
         options: {
+            emailRedirectTo: window.location.origin,
             data: {
                 name,
                 last_name: lastName,
