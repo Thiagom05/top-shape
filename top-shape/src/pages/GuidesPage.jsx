@@ -7,13 +7,15 @@ export default function GuidesPage() {
     const { showAlert } = useAlert();
     const [showModal, setShowModal] = useState(false);
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [fullscreenImage, setFullscreenImage] = useState(null);
 
     const carruselImages = [
         "/assets/carrusel/foto1.webp",
         "/assets/carrusel/foto2.webp",
         "/assets/carrusel/foto3.webp",
         "/assets/carrusel/foto4.webp",
-        "/assets/carrusel/foto5.webp"
+        "/assets/carrusel/foto5.webp",
+        "/assets/carrusel/foto6.webp"
     ];
 
     async function handleDownload(fileName) {
@@ -94,7 +96,7 @@ export default function GuidesPage() {
 
                 {/* Guía de Suplementación (Nueva Tarjeta) */}
                 <div className="guide-card">
-                    <div className="guide-card-image-mock">
+                    <div className="guide-card-image-mock clickable-image" onClick={() => setShowModal(true)}>
                         <img
                             src="/assets/6F7E8406-A80C-4402-82EE-23A92E7D983C.webp"
                             alt="Portada Suplementación Top Shape"
@@ -125,7 +127,7 @@ export default function GuidesPage() {
 
                         <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center", width: "100%", borderRadius: "12px", overflow: "hidden", border: "1px solid var(--border)", backgroundColor: "#000", aspectRatio: "2 / 3", maxHeight: "70vh" }}>
                             {/* Botón de Izquierda */}
-                            <button 
+                            <button
                                 onClick={handlePrevSlide}
                                 style={{
                                     position: "absolute",
@@ -152,11 +154,13 @@ export default function GuidesPage() {
                             <img
                                 src={carruselImages[currentSlide]}
                                 alt={`Suplementación info slide ${currentSlide + 1}`}
+                                className="clickable-image"
+                                onClick={() => setFullscreenImage(carruselImages[currentSlide])}
                                 style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
                             />
 
                             {/* Botón de Derecha */}
-                            <button 
+                            <button
                                 onClick={handleNextSlide}
                                 style={{
                                     position: "absolute",
@@ -200,6 +204,21 @@ export default function GuidesPage() {
                             ))}
                         </div>
                     </div>
+                </div>
+            )}
+
+            {/* Lightbox para Pantalla Completa */}
+            {fullscreenImage && (
+                <div className="fullscreen-lightbox" onClick={() => setFullscreenImage(null)}>
+                    <button className="fullscreen-lightbox-close" onClick={() => setFullscreenImage(null)}>
+                        &times;
+                    </button>
+                    <img
+                        src={fullscreenImage}
+                        alt="Imagen en pantalla completa"
+                        className="fullscreen-lightbox-img"
+                        onClick={(e) => e.stopPropagation()}
+                    />
                 </div>
             )}
         </div>

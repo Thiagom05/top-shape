@@ -41,10 +41,10 @@ export default function HomePage() {
                         />
                     ) : (
                         <div className="video-thumbnail-container" onClick={() => setIsPlaying(true)}>
-                            <img 
-                                src="/assets/DSC02018.webp" 
-                                className="video-thumbnail-img" 
-                                alt="Portada Video de Bienvenida" 
+                            <img
+                                src="/assets/DSC02018.webp"
+                                className="video-thumbnail-img"
+                                alt="Portada Video de Bienvenida"
                             />
                             <div className="play-button-overlay" style={{ zIndex: 2 }}>
                                 <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
@@ -101,11 +101,11 @@ export default function HomePage() {
                         <div className="quick-access-left">
                             <div className="quick-access-icon-wrapper">
                                 <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <polygon points="23 7 16 12 23 17 23 7" />
-                                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
                                 </svg>
                             </div>
-                            <span className="quick-access-title">Recursos adicionales</span>
+                            <span className="quick-access-title">Recursos</span>
                         </div>
                         <svg className="quick-access-arrow" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
                             <polyline points="9 18 15 12 9 6" />

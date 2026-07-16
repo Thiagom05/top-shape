@@ -7,8 +7,13 @@ export default function TopNavigation() {
     return (
         <header className="top-nav">
             <div className="top-nav-container">
-                <Link to="/home" className="logo">
-                    TOP <span className="pink-text">SHAPE</span>
+                <Link to="/home" className="logo" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <img 
+                        src="/assets/TOPSHAPE.webp" 
+                        alt="Top Shape Logo" 
+                        style={{ height: "32px", width: "auto", objectFit: "contain" }} 
+                    />
+                    <span>TOP <span className="pink-text">SHAPE</span></span>
                 </Link>
 
                 <nav className="desktop-links">
