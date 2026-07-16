@@ -12,15 +12,15 @@ export default function GuidesPage() {
     const [imageFade, setImageFade] = useState(true);
 
     useEffect(() => {
-        if (showModal) {
-            document.body.style.overflow = "hidden";
+        if (showModal || fullscreenImage) {
+            document.body.classList.add("modal-open");
         } else {
-            document.body.style.overflow = "";
+            document.body.classList.remove("modal-open");
         }
         return () => {
-            document.body.style.overflow = "";
+            document.body.classList.remove("modal-open");
         };
-    }, [showModal]);
+    }, [showModal, fullscreenImage]);
 
     const carruselImages = [
         "/assets/carrusel/foto1.webp",

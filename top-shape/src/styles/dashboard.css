@@ -688,3 +688,18 @@
 .carousel-image-animation {
     animation: carouselImageFade 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
+
+/* Prevenir el scroll del fondo (scroll chaining) en celulares cuando hay modales abiertos */
+body.modal-open {
+    overflow: hidden !important;
+    overscroll-behavior: contain;
+}
+
+.video-modal-backdrop,
+.fullscreen-lightbox {
+    overscroll-behavior: contain;
+}
+
+.video-modal-content {
+    overscroll-behavior: contain;
+}

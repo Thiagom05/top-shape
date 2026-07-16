@@ -16,15 +16,15 @@ export default function ResourcesPage() {
     const [recipeImageFade, setRecipeImageFade] = useState(true);
 
     useEffect(() => {
-        if (selectedResource) {
-            document.body.style.overflow = "hidden";
+        if (selectedResource || fullscreenImage) {
+            document.body.classList.add("modal-open");
         } else {
-            document.body.style.overflow = "";
+            document.body.classList.remove("modal-open");
         }
         return () => {
-            document.body.style.overflow = "";
+            document.body.classList.remove("modal-open");
         };
-    }, [selectedResource]);
+    }, [selectedResource, fullscreenImage]);
 
     const recetarioImages = Array.from({ length: 9 }, (_, i) => `/assets/Recetario/foto${i + 1}.webp`);
 
