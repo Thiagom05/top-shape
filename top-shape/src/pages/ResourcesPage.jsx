@@ -241,9 +241,14 @@ export default function ResourcesPage() {
                                             </svg>
                                             Anterior
                                         </button>
-                                        <span style={{ fontSize: "0.9rem", color: "var(--text-muted)", fontWeight: "600" }}>
-                                            Receta {recipeIndex + 1} de {recetarioImages.length}
-                                        </span>
+                                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px", minWidth: "60px" }}>
+                                            <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                                                Receta
+                                            </span>
+                                            <span style={{ fontSize: "1rem", color: "var(--text-main)", fontWeight: "700" }}>
+                                                {recipeIndex + 1}/{recetarioImages.length}
+                                            </span>
+                                        </div>
                                         <button
                                             onClick={nextRecipe}
                                             className="btn-secondary"
