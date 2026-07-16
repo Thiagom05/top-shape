@@ -71,8 +71,11 @@ export default function ResourcesPage() {
                             color: "var(--primary)"
                         }}
                     >
-                        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M2.27 21.73a2.5 2.5 0 0 0 3.54 0L18 9.27l-5.27-5.27L2.27 18.19a2.5 2.5 0 0 0 0 3.54Z" />
+                            <path d="M18 9.27 22 5" />
+                            <path d="m13 4 3-3" />
+                            <path d="m15 6 3-3" />
                         </svg>
                     </div>
                     <div className="video-item-info" style={{ marginLeft: "8px" }}>
