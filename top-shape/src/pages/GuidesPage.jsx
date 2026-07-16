@@ -1,13 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getDocumentUrl } from "../services/storageService";
 import { useAlert } from "../context/AlertContext";
+import { createPortal } from "react-dom";
 
 export default function GuidesPage() {
     const { showAlert } = useAlert();
     const [showModal, setShowModal] = useState(false);
     const [currentSlide, setCurrentSlide] = useState(0);
     const [fullscreenImage, setFullscreenImage] = useState(null);
+    const [imageFade, setImageFade] = useState(true);
+
+    useEffect(() => {
+        if (showModal) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "";
+        }
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, [showModal]);
 
     const carruselImages = [
         "/assets/carrusel/foto1.webp",
@@ -32,10 +45,12 @@ export default function GuidesPage() {
     }
 
     const handleNextSlide = () => {
+        setImageFade(false);
         setCurrentSlide((prev) => (prev === carruselImages.length - 1 ? 0 : prev + 1));
     };
 
     const handlePrevSlide = () => {
+        setImageFade(false);
         setCurrentSlide((prev) => (prev === 0 ? carruselImages.length - 1 : prev - 1));
     };
 
@@ -117,98 +132,132 @@ export default function GuidesPage() {
             </div>
 
             {/* Modal de Detalles del Suplemento */}
-            {showModal && (
+            {showModal && createPortal(
                 <div className="video-modal-backdrop" onClick={() => { setShowModal(false); setCurrentSlide(0); }}>
-                    <div className="video-modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "500px", padding: "16px" }}>
-                        <div className="video-modal-header" style={{ marginBottom: "16px" }}>
-                            <h3 style={{ fontSize: "1.1rem" }}>Suplementación Oficial Top Shape</h3>
+                    <div className="video-modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "420px", padding: "16px" }}>
+                        <div className="video-modal-header" style={{ marginBottom: "16px", paddingBottom: "8px" }}>
+                            <h3 style={{ fontSize: "1.05rem" }}>Suplementación Oficial Top Shape</h3>
                             <button className="video-modal-close" onClick={() => { setShowModal(false); setCurrentSlide(0); }}>&times;</button>
                         </div>
-
-                        <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center", width: "100%", borderRadius: "12px", overflow: "hidden", border: "1px solid var(--border)", backgroundColor: "#000", aspectRatio: "2 / 3", maxHeight: "70vh" }}>
-                            {/* Botón de Izquierda */}
-                            <button
-                                onClick={handlePrevSlide}
-                                style={{
-                                    position: "absolute",
-                                    left: "12px",
-                                    background: "rgba(15, 15, 15, 0.75)",
-                                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                                    borderRadius: "50%",
-                                    width: "36px",
-                                    height: "36px",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    color: "#fff",
-                                    cursor: "pointer",
-                                    transition: "var(--transition)",
-                                    zIndex: 10
-                                }}
-                            >
-                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                    <polyline points="15 18 9 12 15 6" />
-                                </svg>
-                            </button>
-
-                            <img
-                                src={carruselImages[currentSlide]}
-                                alt={`Suplementación info slide ${currentSlide + 1}`}
-                                className="clickable-image"
-                                onClick={() => setFullscreenImage(carruselImages[currentSlide])}
-                                style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
-                            />
-
-                            {/* Botón de Derecha */}
-                            <button
-                                onClick={handleNextSlide}
-                                style={{
-                                    position: "absolute",
-                                    right: "12px",
-                                    background: "rgba(15, 15, 15, 0.75)",
-                                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                                    borderRadius: "50%",
-                                    width: "36px",
-                                    height: "36px",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    color: "#fff",
-                                    cursor: "pointer",
-                                    transition: "var(--transition)",
-                                    zIndex: 10
-                                }}
-                            >
-                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                    <polyline points="9 18 15 12 9 6" />
-                                </svg>
-                            </button>
-                        </div>
-
-                        {/* Puntos Indicadores */}
-                        <div style={{ display: "flex", gap: "8px", justifyContent: "center", marginTop: "16px" }}>
-                            {carruselImages.map((_, index) => (
+                        <div style={{ display: "flex", flexDirection: "column", overflowY: "auto", flex: 1, width: "100%", paddingRight: "4px", WebkitOverflowScrolling: "touch" }}>
+                            <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center", width: "100%", borderRadius: "12px", overflow: "hidden", border: "1px solid var(--border)", backgroundColor: "#000", aspectRatio: "2 / 3", maxHeight: "70vh", flexShrink: 0 }}>
+                                {/* Botón de Izquierda */}
                                 <button
-                                    key={index}
-                                    onClick={() => setCurrentSlide(index)}
+                                    onClick={handlePrevSlide}
                                     style={{
-                                        width: "8px",
-                                        height: "8px",
+                                        position: "absolute",
+                                        left: "12px",
+                                        background: "rgba(15, 15, 15, 0.75)",
+                                        border: "1px solid rgba(255, 255, 255, 0.1)",
                                         borderRadius: "50%",
-                                        border: "none",
-                                        backgroundColor: currentSlide === index ? "var(--primary)" : "var(--border)",
+                                        width: "36px",
+                                        height: "36px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        color: "#fff",
                                         cursor: "pointer",
-                                        transition: "var(--transition)"
+                                        transition: "var(--transition)",
+                                        zIndex: 10
                                     }}
+                                >
+                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                        <polyline points="15 18 9 12 15 6" />
+                                    </svg>
+                                </button>
+
+                                <img
+                                    src={carruselImages[currentSlide]}
+                                    alt={`Suplementación info slide ${currentSlide + 1}`}
+                                    className={`clickable-image ${imageFade ? "carousel-image-animation" : ""}`}
+                                    onLoad={() => setImageFade(true)}
+                                    onClick={() => setFullscreenImage(carruselImages[currentSlide])}
+                                    style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
                                 />
-                            ))}
+
+                                {/* Botón de Derecha */}
+                                <button
+                                    onClick={handleNextSlide}
+                                    style={{
+                                        position: "absolute",
+                                        right: "12px",
+                                        background: "rgba(15, 15, 15, 0.75)",
+                                        border: "1px solid rgba(255, 255, 255, 0.1)",
+                                        borderRadius: "50%",
+                                        width: "36px",
+                                        height: "36px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        color: "#fff",
+                                        cursor: "pointer",
+                                        transition: "var(--transition)",
+                                        zIndex: 10
+                                    }}
+                                >
+                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                        <polyline points="9 18 15 12 9 6" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {/* Puntos Indicadores */}
+                            <div style={{ display: "flex", gap: "8px", justifyContent: "center", marginTop: "16px", flexShrink: 0 }}>
+                                {carruselImages.map((_, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => {
+                                            setImageFade(false);
+                                            setCurrentSlide(index);
+                                        }}
+                                        style={{
+                                            width: "8px",
+                                            height: "8px",
+                                            borderRadius: "50%",
+                                            border: "none",
+                                            backgroundColor: currentSlide === index ? "var(--primary)" : "var(--border)",
+                                            cursor: "pointer",
+                                            transition: "var(--transition)"
+                                        }}
+                                    />
+                                ))}
+                            </div>
+
+                            {/* Beneficios de Top Shape */}
+                            <div style={{ marginTop: "20px", borderTop: "1px solid var(--border)", paddingTop: "16px", flexShrink: 0 }}>
+                                <h4 style={{ fontSize: "0.85rem", fontWeight: "700", marginBottom: "10px", color: "var(--text-main)", display: "flex", alignItems: "center", gap: "6px" }}>
+                                    ¿Cómo te ayuda Top Shape?
+                                </h4>
+                                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                                    <div style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "0.8rem" }}>
+                                        <span style={{ color: "var(--primary)", flexShrink: 0 }}>-</span>
+                                        <span style={{ color: "var(--text-muted)" }}>Disminuye los antojos</span>
+                                    </div>
+                                    <div style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "0.8rem" }}>
+                                        <span style={{ color: "var(--primary)", flexShrink: 0 }}>-</span>
+                                        <span style={{ color: "var(--text-muted)" }}>Aumenta la sensación de saciedad</span>
+                                    </div>
+                                    <div style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "0.8rem" }}>
+                                        <span style={{ color: "var(--primary)", flexShrink: 0 }}>-</span>
+                                        <span style={{ color: "var(--text-muted)" }}>Sentirte satisfecho(a) por más tiempo</span>
+                                    </div>
+                                    <div style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "0.8rem" }}>
+                                        <span style={{ color: "var(--primary)", flexShrink: 0 }}>-</span>
+                                        <span style={{ color: "var(--text-muted)" }}>Facilita el seguimiento del plan sin tanta ansiedad</span>
+                                    </div>
+                                </div>
+
+                                <div style={{ marginTop: "12px", padding: "8px 12px", backgroundColor: "rgba(0, 124, 137, 0.05)", borderRadius: "8px", border: "1px dashed rgba(0, 124, 137, 0.2)", fontSize: "0.75rem", color: "var(--text-muted)", textAlign: "center", lineHeight: "1.3" }}>
+                                    <strong>Regla del Reto:</strong> Consumir Top Shape diariamente durante los 30 días es requisito para competir por los premios.
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            )}
+            , document.body)}
 
             {/* Lightbox para Pantalla Completa */}
-            {fullscreenImage && (
+            {fullscreenImage && createPortal(
                 <div className="fullscreen-lightbox" onClick={() => setFullscreenImage(null)}>
                     <button className="fullscreen-lightbox-close" onClick={() => setFullscreenImage(null)}>
                         &times;
@@ -220,7 +269,7 @@ export default function GuidesPage() {
                         onClick={(e) => e.stopPropagation()}
                     />
                 </div>
-            )}
+            , document.body)}
         </div>
     );
 }

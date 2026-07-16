@@ -3,17 +3,17 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useAlert } from "../context/AlertContext";
 import { compressImage } from "../utils/imageOptimizer";
-import { 
-    uploadProgressPhoto, 
-    getProgressPhotoUrl, 
-    saveProgressPhotoRecord, 
-    getUserPhotos 
+import {
+    uploadProgressPhoto,
+    getProgressPhotoUrl,
+    saveProgressPhotoRecord,
+    getUserPhotos
 } from "../services/storageService";
 
 export default function ProgressPage() {
     const { user } = useAuth();
     const { showAlert } = useAlert();
-    
+
     // Estados para los ángulos seleccionados en cada fase
     const [beforeAngle, setBeforeAngle] = useState("front");
     const [afterAngle, setAfterAngle] = useState("front");
@@ -35,7 +35,7 @@ export default function ProgressPage() {
             try {
                 setLoadingPhotos(true);
                 const photos = await getUserPhotos(user.id);
-                
+
                 const urlsMap = {};
                 // Para cada foto que ya exista en base de datos, obtenemos su URL firmada
                 await Promise.all(
@@ -186,16 +186,16 @@ export default function ProgressPage() {
             ) : (
                 <div className="grid-2">
                     {/* Inputs de archivos ocultos */}
-                    <input 
-                        type="file" 
-                        ref={beforeFileInputRef} 
+                    <input
+                        type="file"
+                        ref={beforeFileInputRef}
                         onChange={(e) => handleFileChange(e, "before", beforeAngle)}
                         style={{ display: "none" }}
                         accept="image/*"
                     />
-                    <input 
-                        type="file" 
-                        ref={afterFileInputRef} 
+                    <input
+                        type="file"
+                        ref={afterFileInputRef}
                         onChange={(e) => handleFileChange(e, "after", afterAngle)}
                         style={{ display: "none" }}
                         accept="image/*"
@@ -205,7 +205,7 @@ export default function ProgressPage() {
                     <div className="card">
                         <h2 style={{ fontSize: "1.2rem", marginBottom: "4px" }}>Foto del antes</h2>
                         <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", marginBottom: "16px" }}>Subí tus fotos de control al iniciar el reto.</p>
-                        
+
                         {/* Selector de ángulos */}
                         <div className="angle-selector">
                             <button className={`angle-btn ${beforeAngle === "front" ? "active" : ""}`} onClick={() => setBeforeAngle("front")}>Frente</button>
@@ -220,7 +220,7 @@ export default function ProgressPage() {
                     <div className="card">
                         <h2 style={{ fontSize: "1.2rem", marginBottom: "4px" }}>Foto del después</h2>
                         <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", marginBottom: "16px" }}>Subí tus fotos finales para comparar tu evolución.</p>
-                        
+
                         {/* Selector de ángulos */}
                         <div className="angle-selector">
                             <button className={`angle-btn ${afterAngle === "front" ? "active" : ""}`} onClick={() => setAfterAngle("front")}>Frente</button>
@@ -233,11 +233,39 @@ export default function ProgressPage() {
                 </div>
             )}
 
-            {/* Banner Motivacional */}
-            <div className="progress-alert-banner">
-                <div>
-                    <strong style={{ display: "block", marginBottom: "2px" }}>¡Tu progreso inspira!</strong>
-                    No te olvides de tomarte la foto con buena luz natural, en la misma posición y vistiendo la misma ropa para ver la transformación de forma clara.
+            {/* Reglas de Fotos de Progreso para el Reto */}
+            <div className="card" style={{ marginTop: "24px", borderColor: "rgba(209, 18, 42, 0.2)", backgroundColor: "rgba(209, 18, 42, 0.02)" }}>
+                <h3 style={{ fontSize: "1.1rem", fontWeight: "700", marginBottom: "12px", color: "var(--text-main)", display: "flex", alignItems: "center", gap: "8px" }}>
+                    Reglas para Premios
+                </h3>
+                <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", marginBottom: "16px" }}>
+                    Para participar por los <strong>$1.000</strong> y los kits de bienestar, es obligatorio cumplir con los siguientes requisitos fotográficos al inicio y final de los 30 días:
+                </p>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "16px" }}>
+                    <div style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
+                        <div style={{ color: "var(--accent)", fontWeight: "bold", fontSize: "1rem", lineHeight: "1" }}>•</div>
+                        <div style={{ fontSize: "0.85rem", lineHeight: "1.4" }}>
+                            <strong>Tres Ángulos Requeridos:</strong> Debés subir una foto de <strong>Frente</strong>, otra de <strong>Perfil</strong> y otra de <strong>Espalda</strong>.
+                        </div>
+                    </div>
+                    <div style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
+                        <div style={{ color: "var(--accent)", fontWeight: "bold", fontSize: "1rem", lineHeight: "1" }}>•</div>
+                        <div style={{ fontSize: "0.85rem", lineHeight: "1.4" }}>
+                            <strong>Consistencia Visual:</strong> Las fotos iniciales y finales deben tomarse con <strong>ropa similar</strong>, <strong>buena iluminación</strong> y sin ningún tipo de filtros ni edición.
+                        </div>
+                    </div>
+                    <div style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
+                        <div style={{ color: "var(--accent)", fontWeight: "bold", fontSize: "1rem", lineHeight: "1" }}>•</div>
+                        <div style={{ fontSize: "0.85rem", lineHeight: "1.4" }}>
+                            <strong>Registro de Peso:</strong> Al finalizar los 30 días del reto, volverás a enviar las mismas tres fotografías <strong>con el peso actual encima de la imagen</strong> para evaluar la transformación.
+                        </div>
+                    </div>
+                    <div style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
+                        <div style={{ color: "var(--accent)", fontWeight: "bold", fontSize: "1rem", lineHeight: "1" }}>•</div>
+                        <div style={{ fontSize: "0.85rem", lineHeight: "1.4" }}>
+                            <strong>Compromiso Completo:</strong> Solo participarán por los premios quienes completen los 30 días, consuman el suplemento diariamente y sigan el plan de alimentación y entrenamiento.
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

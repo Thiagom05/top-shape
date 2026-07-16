@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { createPortal } from "react-dom";
 
 const tipsData = [
     { id: 1, title: "Frecuencia e Intensidad", desc: "Para ver resultados reales, entrena entre 3 y 5 veces por semana, priorizando la intensidad y técnica en cada serie." },
@@ -12,6 +13,18 @@ export default function ResourcesPage() {
     const [recipeIndex, setRecipeIndex] = useState(0); // 0 a 8 para las 9 fotos del recetario
     const [listPage, setListPage] = useState(1); // 1 o 2 para la lista inteligente
     const [fullscreenImage, setFullscreenImage] = useState(null); // Imagen activa en pantalla completa
+    const [recipeImageFade, setRecipeImageFade] = useState(true);
+
+    useEffect(() => {
+        if (selectedResource) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "";
+        }
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, [selectedResource]);
 
     const recetarioImages = Array.from({ length: 9 }, (_, i) => `/assets/Recetario/foto${i + 1}.webp`);
 
@@ -27,10 +40,12 @@ export default function ResourcesPage() {
 
     // Funciones de navegación del recetario
     function nextRecipe() {
+        setRecipeImageFade(false);
         setRecipeIndex((prev) => (prev + 1) % recetarioImages.length);
     }
 
     function prevRecipe() {
+        setRecipeImageFade(false);
         setRecipeIndex((prev) => (prev - 1 + recetarioImages.length) % recetarioImages.length);
     }
 
@@ -207,9 +222,9 @@ export default function ResourcesPage() {
             </div>
 
             {/* Modales de los Recursos */}
-            {selectedResource && (
+            {selectedResource && createPortal(
                 <div className="video-modal-backdrop" onClick={handleCloseModal}>
-                    <div className="video-modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "650px" }}>
+                    <div className="video-modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: selectedResource === "premios" ? "420px" : "480px" }}>
                         <div className="video-modal-header" style={{ padding: "16px 20px" }}>
                             <h3 style={{ fontSize: "1.1rem", fontWeight: "700", textTransform: "capitalize" }}>
                                 {selectedResource === "lista" ? "Lista Inteligente Súper" : selectedResource}
@@ -217,16 +232,17 @@ export default function ResourcesPage() {
                             <button className="video-modal-close" onClick={handleCloseModal} style={{ fontSize: "1.8rem" }}>&times;</button>
                         </div>
 
-                        <div style={{ backgroundColor: "#000", padding: "16px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                        <div style={{ backgroundColor: "#000", padding: "20px", display: "flex", flexDirection: "column", overflowY: "auto", flex: 1, width: "100%", WebkitOverflowScrolling: "touch" }}>
 
                             {/* Modal Content: Recetario */}
                             {selectedResource === "recetario" && (
                                 <div style={{ width: "100%", position: "relative" }}>
-                                    <div style={{ minHeight: "350px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                    <div style={{ minHeight: "300px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                                         <img
                                             src={recetarioImages[recipeIndex]}
                                             alt={`Receta ${recipeIndex + 1}`}
-                                            className="clickable-image"
+                                            className={`clickable-image ${recipeImageFade ? "carousel-image-animation" : ""}`}
+                                            onLoad={() => setRecipeImageFade(true)}
                                             onClick={() => setFullscreenImage(recetarioImages[recipeIndex])}
                                             style={{ width: "100%", maxHeight: "70vh", objectFit: "contain", borderRadius: "8px", display: "block" }}
                                         />
@@ -315,13 +331,67 @@ export default function ResourcesPage() {
                                             Descargar Premios
                                         </a>
                                     </div>
+
+                                    <div style={{ marginTop: "24px", borderTop: "1px solid var(--border)", paddingTop: "20px", textAlign: "left" }}>
+                                        <h4 style={{ fontSize: "1rem", fontWeight: "700", marginBottom: "16px", color: "var(--text-main)", textAlign: "center" }}>
+                                            Detalles del Concurso de Transformación
+                                        </h4>
+
+                                        {/* Podio de Premios */}
+                                        <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "20px" }}>
+                                            <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px", borderRadius: "12px", background: "linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(0, 0, 0, 0) 100%)", border: "1px solid rgba(212, 175, 55, 0.2)" }}>
+                                                <span style={{ fontSize: "1.5rem" }}>🥇</span>
+                                                <div>
+                                                    <strong style={{ display: "block", fontSize: "0.85rem", color: "#d4af37" }}>PRIMER LUGAR</strong>
+                                                    <span style={{ fontSize: "0.95rem", fontWeight: "700" }}>$1.000 a la mejor transformación física</span>
+                                                </div>
+                                            </div>
+
+                                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                                                <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px", borderRadius: "12px", background: "linear-gradient(135deg, rgba(192, 192, 192, 0.08) 0%, rgba(0, 0, 0, 0) 100%)", border: "1px solid rgba(192, 192, 192, 0.2)" }}>
+                                                    <span style={{ fontSize: "1.2rem" }}>🥈</span>
+                                                    <div>
+                                                        <strong style={{ display: "block", fontSize: "0.75rem", color: "#c0c0c0" }}>SEGUNDO LUGAR</strong>
+                                                        <span style={{ fontSize: "0.8rem", fontWeight: "600" }}>Kit de Bienestar & Nutrición</span>
+                                                    </div>
+                                                </div>
+                                                <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px", borderRadius: "12px", background: "linear-gradient(135deg, rgba(205, 127, 50, 0.08) 0%, rgba(0, 0, 0, 0) 100%)", border: "1px solid rgba(205, 127, 50, 0.2)" }}>
+                                                    <span style={{ fontSize: "1.2rem" }}>🥉</span>
+                                                    <div>
+                                                        <strong style={{ display: "block", fontSize: "0.75rem", color: "#cd7f32" }}>TERCER LUGAR</strong>
+                                                        <span style={{ fontSize: "0.8rem", fontWeight: "600" }}>Kit de Bienestar & Nutrición</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Criterio y Reglas */}
+                                        <div style={{ display: "flex", flexDirection: "column", gap: "14px", backgroundColor: "var(--input-bg)", padding: "16px", borderRadius: "12px", border: "1px solid var(--border)" }}>
+                                            <div>
+                                                <strong style={{ fontSize: "0.85rem", color: "var(--text-main)", display: "block", marginBottom: "4px" }}>¿Cómo se elegirá al ganador?</strong>
+                                                <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", lineHeight: "1.4", display: "block" }}>
+                                                    La selección se basará en el cambio físico final, el compromiso general y el cumplimiento del programa. Al inicio y al finalizar los 30 días, deberás subir las fotos de tus 3 ángulos (frente, perfil, espalda) tomadas bajo las mismas condiciones (ropa similar, buena luz y peso actual sobre la foto).
+                                                </span>
+                                            </div>
+
+                                            <div style={{ borderTop: "1px solid var(--border)", paddingTop: "12px" }}>
+                                                <strong style={{ fontSize: "0.85rem", color: "var(--text-main)", display: "block", marginBottom: "8px" }}>Requisitos obligatorios:</strong>
+                                                <div style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "0.8rem", color: "var(--text-muted)" }}>
+                                                    <div>• Consumir Top Shape diariamente durante los 30 días.</div>
+                                                    <div>• Seguir el plan de alimentación y entrenamiento de las guías.</div>
+                                                    <div>• Completar tu registro de hábitos en el calendario.</div>
+                                                    <div>• Enviar las fotos de progreso correspondientes al inicio y al final.</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             )}
 
                             {/* Modal Content: Lista Inteligente */}
                             {selectedResource === "lista" && (
                                 <div style={{ width: "100%" }}>
-                                    <div style={{ minHeight: "350px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                    <div style={{ minHeight: "300px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                                         <img
                                             src={listPage === 1 ? "/assets/Lista inteligente super/IMG_7261.webp" : "/assets/Lista inteligente super/IMG_7262.webp"}
                                             alt={`Lista Inteligente Página ${listPage}`}
@@ -354,10 +424,10 @@ export default function ResourcesPage() {
                         </div>
                     </div>
                 </div>
-            )}
+            , document.body)}
 
             {/* Lightbox para Pantalla Completa (Estilo Guías) */}
-            {fullscreenImage && (
+            {fullscreenImage && createPortal(
                 <div className="fullscreen-lightbox" onClick={() => setFullscreenImage(null)}>
                     <button className="fullscreen-lightbox-close" onClick={() => setFullscreenImage(null)}>&times;</button>
                     <img
@@ -367,7 +437,7 @@ export default function ResourcesPage() {
                         onClick={(e) => e.stopPropagation()}
                     />
                 </div>
-            )}
+            , document.body)}
         </div>
     );
 }
