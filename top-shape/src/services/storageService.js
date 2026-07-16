@@ -99,7 +99,7 @@ export async function saveProgressPhotoRecord(userId, phase, view, storagePath) 
             user_id: userId,
             phase,
             view,
-            image_url: storagePath,
+            storage_path: storagePath,
             uploaded_at: new Date().toISOString()
         }, {
             onConflict: "user_id,phase,view"
